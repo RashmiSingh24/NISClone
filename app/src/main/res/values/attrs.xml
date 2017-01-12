@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="VerticalViewPager">
+        <attr name="swipe_orientation" format="string"/>
+
+    </declare-styleable>
+
+
+
+
+
+</resources>
