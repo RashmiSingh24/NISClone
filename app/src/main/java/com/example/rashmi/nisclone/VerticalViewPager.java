@@ -18,28 +18,37 @@ public class VerticalViewPager extends ViewPager {
     }
     private class VerticalPageTransformer implements PageTransformer {
 
+        private static final float MIN_SCALE = 0.75f;
 
         @Override
-        public void transformPage(View page, float position) {
-            if (position < -1) {
-                // This page is way off-screen to the left
-                page.setAlpha(0);
-            } else if (position <= 1) {
-                page.setAlpha(1);
+        public void transformPage(View view, float position) {
+            int pageWidth = view.getWidth();
+            int pageHeight = view.getHeight();
+            float alpha = 0;
+            if (0 <= position && position <= 1) {
+                alpha = 1 - position;
+            } else if (-1 < position && position < 0) {
+                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
+                float verticalMargin = pageHeight * (1 - scaleFactor) / 2;
+                float horizontalMargin = pageWidth * (1 - scaleFactor) / 2;
+                if (position < 0) {
+                    view.setTranslationX(horizontalMargin - verticalMargin / 2);
+                } else {
+                    view.setTranslationX(-horizontalMargin + verticalMargin / 2);
+                }
 
-                // Counteract the default slide transition
-                page.setTranslationX(page.getWidth() * -position);
+                view.setScaleX(scaleFactor);
+                view.setScaleY(scaleFactor);
 
-                // set Y position to swipe in from top
-                float yPosition = position * page.getHeight();
-                page.setTranslationY(yPosition);
-            } else {
-                // This page is way off screen to the right
-                page.setAlpha(0);
+                alpha = position + 1;
             }
-        }
-        }
 
+            view.setAlpha(alpha);
+            view.setTranslationX(view.getWidth() * -position);
+            float yPosition = position * view.getHeight();
+            view.setTranslationY(yPosition);
+        }
+    }
 
     private MotionEvent swapTouchEvent(MotionEvent event) {
         float width = getWidth();
